@@ -12,7 +12,7 @@ Role Variables
 --------------
 
 | Variable | Description |
---------------------------
+|----------|-------------|
 | bitcoin_host_type | A compilation target tuple. Useful for targeting compilation on hardware other than `x86_64-unknown-linux-gnu`. |
 | bitcoin_repo_url | The Git-accessible path to the Bitcoin source code. | 
 | bitcoin_repo_checkout | The branch or commit to checkout. | 
