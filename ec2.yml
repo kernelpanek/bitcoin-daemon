@@ -1,0 +1,79 @@
+---
+- name: "Deploy to EC2"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_prompt:
+    - name: "region"
+      prompt: "Which AWS region to use?"
+      default: "us-east-1"
+
+    - name: "key_name"
+      prompt: "Which SSH key to use?"
+      default: "default"
+
+    - name: "vpc_id"
+      prompt: "Which VPC to use?"
+
+    - name: "vpc_subnet_id"
+      prompt: "Which VPC subnet to use?"
+
+    - name: "image"
+      prompt: "Which EC2 image to use?"
+      default: "ami-cb4b94dd"
+
+    - name: "instance_type"
+      prompt: "Which EC2 instance type to use?"
+      default: "t2.small"
+
+  tasks:
+  - name: "Generate new security group"
+    ec2_group:
+      name: "Bitcoin Daemon Servers"
+      region: "{{ region }}"
+      vpc_id: "{{ vpc_id }}"
+      rules:
+        - proto: tcp
+          from_port: 8332
+          to_port: 8333
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 18332
+          to_port: 18333
+          cidr_ip: 0.0.0.0/0
+    register: ec2_secgrp
+
+  - name: "Instanciate new ec2 instance"
+    ec2:
+      assign_public_ip: no
+      region: "{{ region }}"
+      key_name: "{{ key_name }}"
+      group_id: "{{ ec2_secgrp.group_id }}"
+      instance_type: "{{ instance_type }}"
+      vpc_subnet_id: "{{ vpc_subnet_id }}"
+      image: "{{ image }}"
+      wait: yes
+      wait_timeout: 500
+      exact_count: 1
+      count_tag:
+         role: bitcoin_daemon
+      instance_tags:
+         role: bitcoin_daemon
+    register: bitcoin_instance
+
+  - name: "Wait for SSH to become available"
+    wait_for: host={{ bitcoin_instance.tagged_instances.0.private_ip }} port=22 delay=60 timeout=1280 state=started
+              search_regex=OpenSSH
+
+  - name: "Add host"
+    add_host: name={{ bitcoin_instance.tagged_instances.0.private_ip }} groups=my_ec2_instances
+
+  - name: "Extra time to allow the new instance to settle all other initialization/boot activities"
+    pause: seconds=60
+
+- hosts: my_ec2_instances
+  remote_user: "{{ remote_user | default('ec2-user') }}"
+  become: true
+  become_method: sudo
+  roles:
+    - { role: bitcoin-daemon }

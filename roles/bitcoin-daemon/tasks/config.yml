@@ -1,0 +1,7 @@
+---
+- file: path=/root/.bitcoin state=directory
+
+- name: "Generate bitcoin.conf"
+  template:
+    src: bitcoin.conf.j2
+    dest: /root/.bitcoin/bitcoin.conf

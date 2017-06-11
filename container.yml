@@ -1,0 +1,16 @@
+version: "2"
+settings:
+  conductor_base: debian:jessie
+defaults:
+  BITCOIN_PORTS:
+    - 8332
+    - 8333
+    - 18332
+    - 18333
+services:
+  bitcoin-daemon:
+    from: debian:jessie
+    roles:
+      - bitcoin-daemon
+    command: ["/opt/bitcoin/bin/bitcoind"]
+    expose: "{{ BITCOIN_PORTS }}"

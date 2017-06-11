@@ -1,0 +1,36 @@
+---
+molecule:
+  test:
+    sequence:
+      - destroy
+      - create
+      - converge
+      - verify
+
+ansible:
+  playbook: playbook.yml
+  config_file: ansible.cfg
+  become: True
+  become_method: sudo
+  verbose: vvv
+
+vagrant:
+  raw_config_args:
+    - "vm.network \"private_network\", type: \"dhcp\", use_dhcp_assigned_default_route: true, auto_config: true"
+    - "ssh.insert_key = false"
+
+  platforms:
+    - name: debianjessie64
+      box: debian/jessie64
+      box_url: https://atlas.hashicorp.com/debian/boxes/jessie64/versions/8.8.0/providers/virtualbox.box
+
+  providers:
+    - name: virtualbox
+      type: virtualbox
+      options:
+        memory: 2048
+
+  instances:
+    - name: vagrant-01
+      options:
+        append_platform_to_hostname: no

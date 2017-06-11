@@ -1,0 +1,55 @@
+---
+- name: "Retrieve bitcoin source"
+  git:
+    repo: "{{ bitcoin_repo_url }}"
+    dest: /code
+    depth: 1
+    version: "{{ bitcoin_repo_checkout }}"
+
+- name: "Compile dependencies"
+  command: "make -j{{ ansible_processor_cores }} -C depends HOST={{ bitcoin_host_type }} NO_QT=1 NO_UPNP=1 DEBUG=1"
+  args:
+    chdir: /code
+
+- name: "Create cache"
+  command: "depends/{{ bitcoin_host_type }}/native/bin/ccache --max-size={{ bitcoin_ccache_size }}"
+  args:
+    chdir: /code
+
+- name: "Run autogen script"
+  command: "./autogen.sh"
+  args:
+    chdir: /code
+
+- file: path=/code/build state=directory
+
+- name: "Configure"
+  command: "../configure {{ bitcoin_configure_options }}"
+  args:
+    chdir: /code/build
+
+- name: "Compile distribution directory"
+  command: "make distdir VERSION={{ bitcoin_host_type }}"
+  args:
+    chdir: /code/build
+
+- name: "Configure"
+  command: "./configure {{ bitcoin_host_configure_options }}"
+  args:
+    chdir: "/code/build/bitcoin-{{ bitcoin_host_type }}"
+
+- name: "Install"
+  command: "make install"
+  args:
+    chdir: "/code/build/bitcoin-{{ bitcoin_host_type }}"
+
+- name: "Generate checksum.txt"
+  template:
+    src: checksums.txt.j2
+    dest: /checksums.txt
+
+- name: "Checksum compiled binaries"
+  command: "sha256sum -c /checksums.txt"
+  args:
+    chdir: "{{ bitcoin_bindir }}"
+  ignore_errors: yes

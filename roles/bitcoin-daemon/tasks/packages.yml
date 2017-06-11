@@ -1,0 +1,5 @@
+---
+- name: "Packages for compilation"
+  package:
+    name: "{{ item }}"
+  with_items: "{{ compilation_packages }}"

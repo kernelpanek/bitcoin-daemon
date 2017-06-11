@@ -1,0 +1,52 @@
+---
+# Compilation Defaults
+bitcoin_host_type: "x86_64-unknown-linux-gnu"
+bitcoin_repo_url: "https://github.com/bitcoin/bitcoin.git"
+bitcoin_repo_checkout: "2c2d988"
+bitcoin_ccache_size: "100M"
+
+bitcoin_checksums:
+  - "2b5f378e396aef84e911a1b1375bd51872cb71a2f23e99688166326b0439dedb bitcoind"
+  - "a4a1e1a65e26114d559b2b4d4b150d46431b9b9deafb56d57f3e03c904e7d313 bitcoin-cli"
+  - "700faa720c203736d678def2739ed836ec490cfb39cd27f09f210954cc1ed1f0 bitcoin-tx"
+
+bitcoin_conf:
+  - "printtoconsole=1"
+  - "rpcpassword=${BITCOIN_RPC_PASSWORD:-password}"
+  - "rpcuser=${BITCOIN_RPC_USER:-bitcoin}"
+
+bitcoin_installdir: "/opt/bitcoin"
+bitcoin_bindir: "{{ bitcoin_installdir }}/bin"
+bitcoin_libdir: "{{ bitcoin_installdir }}/lib"
+bitcoin_configure_options: "--cache-file=config.cache --disable-dependency-tracking --prefix={{ bitcoin_installdir }} --bindir={{ bitcoin_bindir }} --libdir={{ bitcoin_libdir }} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports --with-incompatible-bdb CPPFLAGS=-DDEBUG_LOCKORDER"
+bitcoin_host_configure_options: "--cache-file=config.cache --disable-dependency-tracking --prefix={{ bitcoin_installdir }} --bindir={{ bitcoin_bindir }} --libdir={{ bitcoin_libdir }} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports --with-incompatible-bdb CPPFLAGS=-DDEBUG_LOCKORDER"
+
+compilation_packages:
+  - automake
+  - autotools-dev
+  - bc
+  - bsdmainutils
+  - build-essential
+  - ca-certificates
+  - curl
+  - git
+  - libboost-all-dev
+  - libdb++-dev
+  - libevent-dev
+  - libssl-dev
+  - libtool
+  - pkg-config
+  - python3
+  - python3-zmq
+  - wget
+
+
+
+
+
+
+
+
+
+
+
