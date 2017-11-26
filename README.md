@@ -26,36 +26,6 @@ Role Variables
 | bitcoin_host_configure_options | Configuration switches to set before compiling the installation. |
 | compilation_packages | A list of package names to install prior to compilation. |
 
-Molecule
---------
-
-This role can be tested using Molecule.
-
- Install ...
-
-```bash
-pip install molecule
-```
-
- Run ...
-
-```bash
-molecule converge
-```
-
-Dependencies
-------------
-
-None
-
-Example Playbook
-----------------
-
-```yaml
-- hosts: servers
-  roles:
-     - { role: bitcoin-daemon }
-```
 
 Ansible-container
 -----------------
@@ -67,7 +37,7 @@ pip install ansible-container[docker]
 ansible-container build
 ```
 
-Deploy role to Amazon ec2
+Deploy role to Amazon ec2 (WIP)
 -------------------------
 
 Run: ...
